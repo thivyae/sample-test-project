@@ -40,11 +40,14 @@ jobs:
         run: ./gradlew clean test --info
 
       # Install Allure CLI
-      - name: Install Allure
+     # Download and Install Allure CLI
+      - name: Install Allure CLI
         run: |
-          sudo apt-add-repository ppa:qameta/allure -y
-          sudo apt-get update -y
-          sudo apt-get install allure -y
+          curl -o allure-2.21.0.tgz -L https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.21.0/allure-commandline-2.21.0.tgz
+          tar -zxvf allure-2.21.0.tgz
+          sudo mv allure-2.21.0 /opt/allure
+          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+          allure --version  # To check if Allure is installed properly
 
       # Generate Allure Report
       - name: Generate Allure Report
