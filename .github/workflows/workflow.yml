@@ -94,6 +94,5 @@ jobs:
 
           # Print the Workflow Link and the Allure Report Link to the GitHub Actions Job Summary
           echo "<br>Workflow Link: $GITHUB_RUN_URL" >> $GITHUB_STEP_SUMMARY
-          echo "### Latest Allure Report" >> $GITHUB_STEP_SUMMARY
-          echo "[View Allure Report]($REPORT_URL)" >> $GITHUB_STEP_SUMMARY
+          echo "<br>Latest Allure Report: $REPORT_URL" >> $GITHUB_STEP_SUMMARY
           echo "<br>Test Status: $TEST_STATUS" >> $GITHUB_STEP_SUMMARY
