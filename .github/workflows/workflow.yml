@@ -37,7 +37,7 @@ jobs:
 
       # Run the Gradle build and execute the tests
       - name: Run tests
-        run: ./gradlew clean test --info
+        run: ./gradlew clean test
 
       # Install Allure CLI
      # Download and Install Allure CLI
