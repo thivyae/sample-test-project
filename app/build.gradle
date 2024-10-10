@@ -1,0 +1,58 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.4'
+    id 'io.qameta.allure' version '2.12.0' // Add the Allure plugin
+}
+
+
+ext {
+    CUCUMBER_VERSION = '7.19.0'
+    LOMBOK_VERSION   = '1.18.34'
+    AWAITILITY_VERSION = '4.2.2'
+    SPRING_VERSION = '3.2.4'
+    TESTNG_VERSION = '7.10.2'
+    RESTASSURED_VERSION = '5.5.0'
+    ALLURE_VERSION = '2.29.0'
+}
+
+dependencies {
+    implementation "io.cucumber:cucumber-testng:${CUCUMBER_VERSION}"
+    implementation "io.cucumber:cucumber-java:${CUCUMBER_VERSION}"
+    implementation "io.cucumber:cucumber-spring:${CUCUMBER_VERSION}"
+    implementation 'io.rest-assured:rest-assured:5.5.0'
+    implementation 'com.google.guava:guava:33.3.1-jre'
+    implementation 'com.azure.spring:spring-cloud-azure-starter-keyvault-secrets:5.16.0'
+    implementation 'org.assertj:assertj-core:3.26.3'
+    implementation "org.awaitility:awaitility:${AWAITILITY_VERSION}"
+    implementation "org.projectlombok:lombok:${LOMBOK_VERSION}"
+    annotationProcessor("org.projectlombok:lombok:${LOMBOK_VERSION}")
+    testAnnotationProcessor("org.projectlombok:lombok:${LOMBOK_VERSION}")
+    implementation "org.springframework.kafka:spring-kafka:${SPRING_VERSION}"
+    implementation "org.springframework.boot:spring-boot-starter-web:${SPRING_VERSION}"
+    testImplementation "io.qameta.allure:allure-rest-assured:${ALLURE_VERSION}"
+    testImplementation "io.qameta.allure:allure-junit5:${ALLURE_VERSION}"
+    testImplementation "io.qameta.allure:allure-java-commons:${ALLURE_VERSION}"
+    testImplementation "io.qameta.allure:allure-testng:${ALLURE_VERSION}"
+    testImplementation("org.springframework.boot:spring-boot-starter-test:${SPRING_VERSION}") {
+        exclude group: 'org.junit.jupiter', module: 'junit-jupiter-api'
+    }
+}
+
+allure {
+    version = '2.30.0'
+}
+
+configurations {
+    configureEach {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+}
+
+test {
+    useTestNG{ suites 'src/test/resources/testng.xml'}
+    testLogging {
+        showStandardStreams = true
+    }
+    systemProperty 'cucumber.filter.tags', System.getProperty('cucumber.filter.tags', '')
+    systemProperty 'threads', System.getProperty('threads', '1')
+}

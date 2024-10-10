@@ -1,0 +1,44 @@
+# ignore ALL .log files
+*.log
+*.idea
+target/
+target/app.js
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+# https://github.com/takari/maven-wrapper#usage-without-binary-jar
+.mvn/wrapper/maven-wrapper.jar
+*.iml
+.DS_Store
+.env
+reports
+allure-report
+*.jks
+ssh_key
+# ignore ALL .log files
+*.log
+*.idea
+target/
+target/app.js
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+# https://github.com/takari/maven-wrapper#usage-without-binary-jar
+.mvn/wrapper/maven-wrapper.jar
+*.iml
+.DS_Store
+.env
+reports
+allure-report
+*.jks
+ssh_key
