@@ -65,6 +65,13 @@ jobs:
           gh_pages: gh-pages
           allure_history: allure-history
           allure_results: build/allure-results
+          
+       # Retain only the latest 30 histories
+      - name: Retain latest 30 histories
+        run: |
+          cd allure-history
+          ls -1t | tail -n +31 | xargs rm -rf
+          cd ..    
 
       # Publish the Allure report to GitHub Pages
       - name: Publish test report
