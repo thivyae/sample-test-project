@@ -42,3 +42,4 @@ reports
 allure-report
 *.jks
 ssh_key
+.idea/*.xml
