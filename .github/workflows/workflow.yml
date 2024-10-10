@@ -73,3 +73,11 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: allure-history
+        
+      # Add reports to summary
+      - name: Add reports to summary
+        if: contains(fromJSON('["success", "failure"]'), steps.test.outcome) && always()
+        run: |
+          echo "# Test Reports" >> $GITHUB_STEP_SUMMARY
+          echo "[Allure Test Report](https://thivyae.github.io/sample-test-project/test-reports/${{ github.sha }}/${{ github.run_id }}/${{ github.run_attempt }}/allure-report/index.html)" >> $GITHUB_STEP_SUMMARY
+          echo "[Tests Report](https://thivyae.github.io/sample-test-project/test-reports/${{ github.sha }}/${{ github.run_id }}/${{ github.run_attempt }}/tests/test/index.html)" >> $GITHUB_STEP_SUMMARY
