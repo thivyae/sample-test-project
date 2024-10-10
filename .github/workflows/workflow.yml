@@ -74,10 +74,19 @@ jobs:
           publish_branch: gh-pages
           publish_dir: allure-history
         
-      # Add reports to summary
+     # Print the test results and links to the GitHub Actions Job Summary
       - name: Add reports to summary
-        if: contains(fromJSON('["success", "failure"]'), steps.test.outcome) && always()
+        env:
+          GITHUB_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          GITHUB_PAGES_WEBSITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.repository }}/
         run: |
-          echo "# Test Reports" >> $GITHUB_STEP_SUMMARY
-          echo "[Allure Test Report](https://thivyae.github.io/sample-test-project/test-reports/${{ github.sha }}/${{ github.run_id }}/${{ github.run_attempt }}/allure-report/index.html)" >> $GITHUB_STEP_SUMMARY
-          echo "[Tests Report](https://thivyae.github.io/sample-test-project/test-reports/${{ github.sha }}/${{ github.run_id }}/${{ github.run_attempt }}/tests/test/index.html)" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ steps.getReport.outputs.passed }}" -eq "${{ steps.getReport.outputs.total }}" ]]; then
+            TEST_STATUS="PASS"
+          else
+            TEST_STATUS="FAIL"
+          fi
+
+          echo "<br>Workflow Link: $GITHUB_RUN_URL" >> $GITHUB_STEP_SUMMARY
+          echo "<br>Detailed Report: ${{ steps.getReport.outputs.report_output }}" >> $GITHUB_STEP_SUMMARY
+          echo "<br>Allure Report Link: $GITHUB_PAGES_WEBSITE_URL" >> $GITHUB_STEP_SUMMARY
+          echo "<br>Test Status: $TEST_STATUS" >> $GITHUB_STEP_SUMMARY
