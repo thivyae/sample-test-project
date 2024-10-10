@@ -56,3 +56,10 @@ test {
     systemProperty 'cucumber.filter.tags', System.getProperty('cucumber.filter.tags', '')
     systemProperty 'threads', System.getProperty('threads', '1')
 }
+springBoot {
+    mainClass = 'com.example.MainApplication'  // Update this to the actual package and class name
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
