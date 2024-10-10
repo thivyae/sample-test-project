@@ -79,7 +79,7 @@ jobs:
       - name: Add reports to summary
         env:
           GITHUB_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          REPORT_URL: https://{userid}.github.io/{reponame}/${{ github.run_number }}/
+          REPORT_URL: https://${{ github.repository_owner }}.github.io/${{ github.repository }}/test-reports/${{ github.run_number }}/
         run: |
           # Determine the test status (Pass or Fail)
           if [[ "${{ steps.getReport.outputs.passed }}" -eq "${{ steps.getReport.outputs.total }}" ]]; then
