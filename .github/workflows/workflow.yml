@@ -79,8 +79,7 @@ jobs:
       - name: Add reports to summary
         env:
           GITHUB_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          # Construct the latest GitHub Pages URL for Allure report
-          GITHUB_PAGES_WEBSITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.repository }}/test-reports/${{ github.run_id }}/allure-report/index.html
+          REPORT_URL: https://github.dev.global.tesco.org/pages/${{ github.repository }}/${{ github.run_number }}/
         run: |
           # Determine the test status (Pass or Fail)
           if [[ "${{ steps.getReport.outputs.passed }}" -eq "${{ steps.getReport.outputs.total }}" ]]; then
@@ -91,6 +90,5 @@ jobs:
 
           # Print the Workflow Link and the Allure Report Link to the GitHub Actions Job Summary
           echo "<br>Workflow Link: $GITHUB_RUN_URL" >> $GITHUB_STEP_SUMMARY
-          echo "<br>Detailed Report: ${{ steps.getReport.outputs.report_output }}" >> $GITHUB_STEP_SUMMARY
-          echo "<br>Allure Report Link: $GITHUB_PAGES_WEBSITE_URL" >> $GITHUB_STEP_SUMMARY
+          echo "<br>Allure Report Link: $REPORT_URL" >> $GITHUB_STEP_SUMMARY
           echo "<br>Test Status: $TEST_STATUS" >> $GITHUB_STEP_SUMMARY
