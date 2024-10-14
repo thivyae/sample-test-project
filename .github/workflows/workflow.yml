@@ -66,12 +66,12 @@ jobs:
           allure_history: allure-history
           allure_results: build/allure-results
           
-      # Retain only the latest 5 histories
-      - name: Retain latest 5 histories
-        run: |
-          cd allure-history
-          ls -1t | tail -n +6 | xargs rm -rf
-          cd ..  
+      # # Retain only the latest 5 histories
+      # - name: Retain latest 5 histories
+      #   run: |
+      #     cd allure-history
+      #     ls -1t | tail -n +6 | xargs rm -rf
+      #     cd ..  
 
       # Publish the Allure report to GitHub Pages
       - name: Publish test report
