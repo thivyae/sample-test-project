@@ -65,16 +65,26 @@ jobs:
           gh_pages: gh-pages
           allure_history: allure-history
           allure_results: build/allure-results
-          
+
+      # Cleanup old reports
       - name: Cleanup old reports
         run: |
           cd gh-pages
-           if [ $num_folders -gt 5 ]; then
-            num_to_delete=$((num_folders - 5))
-            oldest_folders=$(ls -d */ | grep -o '[0-9]*' | sort -n | head -n $num_to_delete)
-            echo $oldest_folders | tr ' ' '\n' | while read folder; do
-              rm -rf  $folder
-            done
+          num_folders=$(git diff --name-only HEAD~5 HEAD | grep '/$' | sort -u | wc -l)
+
+          num_folders=${num_folders:-0}
+          if [ "$num_folders" -gt 20 ]; then
+              num_to_delete=$((num_folders - 20))
+
+
+              oldest_folders=$(git diff --name-only HEAD~5 HEAD | grep '/$' | sort -u | tail -n "$num_to_delete")
+
+              echo "$oldest_folders" | while read -r folder; do
+                  echo "Deleting folder: $folder"
+                  rm -rf "$folder"
+              done
+          else
+              echo "Number of directories ($num_folders) does not exceed 20. No deletion needed."
           fi
 
       # Publish the Allure report to GitHub Pages
@@ -98,9 +108,9 @@ jobs:
 
           # Determine the test status (Pass or Fail)
           if [[ "${{ steps.getReport.outputs.passed }}" -eq "${{ steps.getReport.outputs.total }}" ]]; then
-            TEST_STATUS="PASS"
+              TEST_STATUS="PASS"
           else
-            TEST_STATUS="FAIL"
+              TEST_STATUS="FAIL"
           fi
 
           # Print the Workflow Link and the Allure Report Link to the GitHub Actions Job Summary
