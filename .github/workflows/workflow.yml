@@ -70,7 +70,7 @@ jobs:
       - name: Cleanup old reports
         run: |
           cd gh-pages
-          num_folders=$(git diff --name-only HEAD~5 HEAD | grep '/$' | sort -u | wc -l)
+            num_folders=$(ls -d */  | wc -l)
 
           num_folders=${num_folders:-0}
           if [ "$num_folders" -gt 20 ]; then
