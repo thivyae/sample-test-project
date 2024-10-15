@@ -69,19 +69,13 @@ jobs:
       - name: Cleanup old reports
         run: |
           cd gh-pages
-          # Get the directories from the last 5 commits
-          KEEP_DIRS=$(git log -n 5 --pretty=format: --name-only | sort -u)
-          
-          # Get all report directories
-          ALL_DIRS=$(ls -d report-*)
-
-          # Identify directories to delete
-          for dir in $ALL_DIRS; do
-            if ! echo "$KEEP_DIRS" | grep -q "$dir"; then
-              echo "Deleting old report: $dir"
-              rm -rf "$dir"
-            fi
-          done
+           if [ $num_folders -gt 10 ]; then
+            num_to_delete=$((num_folders - 10))
+            oldest_folders=$(ls -d */ | grep -o '[0-9]*' | sort -n | head -n $num_to_delete)
+            echo $oldest_folders | tr ' ' '\n' | while read folder; do
+              rm -rf  $folder
+            done
+          fi
 
       # Publish the Allure report to GitHub Pages
       - name: Publish test report
