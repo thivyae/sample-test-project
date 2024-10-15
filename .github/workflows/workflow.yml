@@ -69,8 +69,8 @@ jobs:
       - name: Cleanup old reports
         run: |
           cd gh-pages
-           if [ $num_folders -gt 10 ]; then
-            num_to_delete=$((num_folders - 10))
+           if [ $num_folders -gt 5 ]; then
+            num_to_delete=$((num_folders - 5))
             oldest_folders=$(ls -d */ | grep -o '[0-9]*' | sort -n | head -n $num_to_delete)
             echo $oldest_folders | tr ' ' '\n' | while read folder; do
               rm -rf  $folder
