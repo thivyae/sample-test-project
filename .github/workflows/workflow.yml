@@ -74,7 +74,7 @@ jobs:
           echo $(ls)
           num_folders=$(ls -d */  | wc -l)
 
-          if [ $num_folders > 10 ]; then
+          if [ $num_folders -gt 10 ]; then
             num_to_delete=$((num_folders - 10))
             echo "($num_to_delete) to delete"
             oldest_folders=$(ls -d */ | grep -o '[0-9]*' | sort -n | head -n $num_to_delete)
