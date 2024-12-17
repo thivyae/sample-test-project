@@ -62,8 +62,8 @@ jobs:
         uses: simple-elf/allure-report-action@v1.7
         if: always()
         with:
-          gh_pages: gh-pages
-          allure_history: allure-history
+          gh_pages: allure-history
+          allure_history: allure-all-history
           allure_results: build/allure-results
 
      # Cleanup old reports
@@ -76,7 +76,6 @@ jobs:
 
           if [ $num_folders > 10 ]; then
             num_to_delete=$((num_folders - 10))
-            echo $num_to_delete to delete
             oldest_folders=$(ls -d */ | grep -o '[0-9]*' | sort -n | head -n $num_to_delete)
             echo $oldest_folders | tr ' ' '\n' | while read folder; do
               rm -rf $folder
@@ -85,7 +84,7 @@ jobs:
           else
               echo "Number of directories ($num_folders) does not exceed 10. No deletion needed."
           fi
-
+          
       # Publish the Allure report to GitHub Pages
       - name: Publish test report
         uses: peaceiris/actions-gh-pages@v3
@@ -93,7 +92,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: allure-history
+          publish_dir: allure-all-history
 
       # Print the test results and links to the GitHub Actions Job Summary
       - name: Add reports to summary
