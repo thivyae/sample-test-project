@@ -82,7 +82,6 @@ jobs:
             echo $oldest_folders | tr ' ' '\n' | while read folder; do
               rm -rf $folder
             done
-
           else
               echo "Number of directories ($num_folders) does not exceed 10. No deletion needed."
           fi
