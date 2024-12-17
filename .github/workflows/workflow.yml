@@ -55,7 +55,7 @@ jobs:
         continue-on-error: true
         with:
           ref: gh-pages
-          path: gh-pages
+          path: allure-history
 
       # Generate Allure report
       - name: Build test report
@@ -69,7 +69,7 @@ jobs:
       # Cleanup old reports
       - name: Cleanup old reports
         run: |
-          cd gh-pages
+          cd allure-history
             num_folders=$(ls -d */  | wc -l)
 
           num_folders=${num_folders:-0}
