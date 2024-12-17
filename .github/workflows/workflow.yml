@@ -80,6 +80,7 @@ jobs:
             oldest_folders=$(ls -d */ | grep -o '[0-9]*' | sort -n | head -n $num_to_delete)
             echo "$oldest_folders oldest folders"
             echo $oldest_folders | tr ' ' '\n' | while read folder; do
+              chmod +w $folder
               rm -rf $folder
             done
           else
