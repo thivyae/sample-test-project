@@ -66,23 +66,22 @@ jobs:
           allure_history: allure-history
           allure_results: build/allure-results
 
-      # Cleanup old reports
+     # Cleanup old reports
       - name: Cleanup old reports
+        if: always()
         run: |
-          cd allure-history
-            num_folders=$(ls -d */  | wc -l)
+          cd allure-all-history
+          echo $(ls)
+          num_folders=$(ls -d */  | wc -l)
 
-          num_folders=${num_folders:-0}
-          if [ "$num_folders" -gt 10 ]; then
-              num_to_delete=$((num_folders - 10))
+          if [ $num_folders > 10 ]; then
+            num_to_delete=$((num_folders - 10))
+            echo $num_to_delete to delete
+            oldest_folders=$(ls -d */ | grep -o '[0-9]*' | sort -n | head -n $num_to_delete)
+            echo $oldest_folders | tr ' ' '\n' | while read folder; do
+              rm -rf $folder
+            done
 
-
-              oldest_folders=$(git diff --name-only HEAD~5 HEAD | grep '/$' | sort -u | tail -n "$num_to_delete")
-
-              echo "$oldest_folders" | while read -r folder; do
-                  echo "Deleting folder: $folder"
-                  rm -rf "$folder"
-              done
           else
               echo "Number of directories ($num_folders) does not exceed 10. No deletion needed."
           fi
