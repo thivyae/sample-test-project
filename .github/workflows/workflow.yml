@@ -1,53 +1,57 @@
-name: CI Pipeline with Allure Reports
+name: E2E-Test-Automation-Fulfilment
 
 on:
   workflow_dispatch:
     inputs:
       exampleInput:
-        description: 'Run tests'
+        description: 'Enter Required Tag'
         required: false
-        default: 'default value'
+        default: 'sanity'
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  common:
+    runs-on: [ tpc03472bg0610 ]
 
     steps:
+      - name: Cleanup workspace
+        uses: actions/runner-workspace-cleaner@main
+
       # Checkout the code
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Set up JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
+          distribution: 'adopt'
           java-version: '17'
-          distribution: 'temurin'
 
-      # Cache Gradle dependencies
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v3
+      # Setup Gradle
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}
+          gradle-version: wrapper
+          cache-disabled: true
+          gradle-home-cache-cleanup: true
+          generate-job-summary: false
 
-      # Run the Gradle build and execute the tests
-      - name: Run tests
-        run: ./gradlew clean test
-
-      # Download and Install Allure CLI
-      - name: Install Allure CLI
+      # Run Gradle Build
+      - name: Run Gradle
+        env:
+          ROLE_ID: ${{ secrets.KVROLEID }}
+          SECRET_ID: ${{ secrets.KVSECRETID }}
+        shell: bash
         run: |
-          curl -o allure-2.21.0.tgz -L https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.21.0/allure-commandline-2.21.0.tgz
-          tar -zxvf allure-2.21.0.tgz
-          sudo mv allure-2.21.0 /opt/allure
-          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
-          allure --version  # To check if Allure is installed properly
-
+          chmod +x .github/workflows/generate_certs.sh  # Ensure it's executable
+          .github/workflows/generate_certs.sh
+          ls -ltr /tmp/cert/ofs
+          ls -ltr /tmp/cert/fps
+          ls -ltr /tmp/cert/transport
+          echo "Start Building Test"
+          ./gradlew clean test -Dcucumber.filter.tags='@${{ github.event.inputs.exampleInput }}' --no-daemon --console=plain
+          echo "Removing certs"
+          rm -rf /tmp/cert
       # Load previous test report history from gh-pages
       - name: Load test report history
         uses: actions/checkout@v3
@@ -55,38 +59,35 @@ jobs:
         continue-on-error: true
         with:
           ref: gh-pages
-          path: allure-history
+          path: /tmp/allure-history
 
       # Generate Allure report
       - name: Build test report
         uses: simple-elf/allure-report-action@v1.7
         if: always()
         with:
-          gh_pages: allure-history
-          allure_history: allure-all-history
+          gh_pages: tmp/allure-history
+          allure_history: tmp/allure-history
           allure_results: build/allure-results
 
-     # Cleanup old reports
+      # Cleanup old reports
       - name: Cleanup old reports
         if: always()
         run: |
-          cd allure-all-history
+          cd /tmp/allure-history
           echo $(ls)
           num_folders=$(ls -d */  | wc -l)
-
           if [ $num_folders -gt 10 ]; then
             num_to_delete=$((num_folders - 10))
             echo "($num_to_delete) to delete"
             oldest_folders=$(ls -d */ | grep -o '[0-9]*' | sort -n | head -n $num_to_delete)
             echo "$oldest_folders oldest folders"
             echo $oldest_folders | tr ' ' '\n' | while read folder; do
-              chmod +w $folder
               rm -rf $folder
             done
           else
               echo "Number of directories ($num_folders) does not exceed 10. No deletion needed."
           fi
-          
       # Publish the Allure report to GitHub Pages
       - name: Publish test report
         uses: peaceiris/actions-gh-pages@v3
@@ -94,25 +95,24 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: allure-all-history
+          publish_dir: /tmp/allure-history
 
       # Print the test results and links to the GitHub Actions Job Summary
       - name: Add reports to summary
+        if: always()
         env:
           GITHUB_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GITHUB_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}  # Directly get the repository name
         run: |
-          REPORT_URL="https://$GITHUB_OWNER.github.io/$REPO_NAME/${{ github.run_number }}/"
+          REPORT_URL="https://github.dev.global.tesco.org/pages/${{ github.repository }}/${{ github.run_number }}/"
           echo "REPORT_URL=$REPORT_URL" >> $GITHUB_ENV
-
           # Determine the test status (Pass or Fail)
           if [[ "${{ steps.getReport.outputs.passed }}" -eq "${{ steps.getReport.outputs.total }}" ]]; then
               TEST_STATUS="PASS"
           else
               TEST_STATUS="FAIL"
           fi
-
           # Print the Workflow Link and the Allure Report Link to the GitHub Actions Job Summary
           echo "<br>Workflow Link: $GITHUB_RUN_URL" >> $GITHUB_STEP_SUMMARY
           echo "<br>Latest Allure Report: $REPORT_URL" >> $GITHUB_STEP_SUMMARY
